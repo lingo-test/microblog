@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
 from flask import render_template, flash, redirect, url_for, request, g, \
     current_app
-from flask_login import current_user, login_required
+from flask_login import current_user, login_required, login_user
 from flask_babel import _, get_locale
 import sqlalchemy as sa
 from langdetect import detect, LangDetectException
 from app import db
+from app.auth.forms import LoginForm
 from app.main.forms import EditProfileForm, EmptyForm, PostForm, SearchForm, \
     MessageForm
 from app.models import User, Post, Message, Notification
@@ -24,8 +25,21 @@ def before_request():
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/index', methods=['GET', 'POST'])
-@login_required
 def index():
+    if current_user.is_anonymous:
+        # 匿名访问时直接以 200 渲染并处理登录表单，
+        # 避免根路径 302 重定向导致平台预览就绪探测失败
+        form = LoginForm()
+        if form.validate_on_submit():
+            user = db.session.scalar(
+                sa.select(User).where(User.username == form.username.data))
+            if user is None or not user.check_password(form.password.data):
+                flash(_('Invalid username or password'))
+                return redirect(url_for('main.index'))
+            login_user(user, remember=form.remember_me.data)
+            return redirect(url_for('main.index'))
+        return render_template('auth/login.html', title=_('Sign In'),
+                               form=form)
     form = PostForm()
     if form.validate_on_submit():
         try:
