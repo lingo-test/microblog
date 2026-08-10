@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "runtime": "python",
+  "port": 8080,
+  "applicationStart": "cd code_deploy_application\npip install --no-user -r requirements.txt\nflask translate compile\nflask db upgrade\nnohup gunicorn -b 0.0.0.0:8080 --access-logfile - --error-logfile - microblog:app >> /root/application.log 2>&1 &\necho $! > /root/application.pid",
+  "applicationStop": "if [ -f /root/application.pid ]; then kill \"$(cat /root/application.pid)\" 2>/dev/null || true; rm -f /root/application.pid; fi"
+}

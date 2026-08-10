@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "projectType": "other",
+  "services": [
+    {
+      "name": "web",
+      "role": "backend",
+      "cwd": ".",
+      "port": 8080,
+      "startCommand": "bash -c 'export PATH=\"$PWD/.venv/bin:$PATH\"; flask translate compile && flask db upgrade && exec gunicorn -b 0.0.0.0:8080 --access-logfile - --error-logfile - microblog:app'",
+      "preview": true
+    }
+  ],
+  "checkCommand": ".venv/bin/python tests.py"
+}
