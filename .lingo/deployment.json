@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "runtime": "python",
+  "port": 8080,
+  "applicationStart": "cd code_deploy_application && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/pip install gunicorn && .venv/bin/flask db upgrade && { nohup env .venv/bin/gunicorn --bind 0.0.0.0:8080 microblog:app >> /root/application.log 2>&1 & APP_PID=$!; echo \"$APP_PID\" > /root/application.pid; APP_READY=0; for ATTEMPT in $(seq 1 30); do if curl -sS -o /dev/null http://127.0.0.1:8080/; then APP_READY=1; break; fi; if ! kill -0 \"$APP_PID\" 2>/dev/null; then echo 'Application process exited before becoming ready.' >&2; exit 1; fi; sleep 2; done; test \"$APP_READY\" -eq 1; }",
+  "applicationStop": "test ! -f /root/application.pid || kill $(cat /root/application.pid) 2>/dev/null || true"
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 2,
+  "projectType": "flask",
+  "services": [
+    {
+      "name": "web",
+      "role": "backend",
+      "cwd": ".",
+      "port": 8000,
+      "startCommand": "python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/pip install gunicorn && .venv/bin/flask db upgrade && .venv/bin/gunicorn --bind 0.0.0.0:8000 microblog:app",
+      "healthCheck": {
+        "type": "http",
+        "path": "/",
+        "timeout": 10
+      },
+      "preview": true,
+      "language": "python",
+      "framework": "flask"
+    }
+  ]
+}
