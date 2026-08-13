@@ -7,10 +7,10 @@
       "role": "backend",
       "cwd": ".",
       "port": 8000,
-      "startCommand": "python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/pip install gunicorn && .venv/bin/flask db upgrade && .venv/bin/gunicorn --bind 0.0.0.0:8000 microblog:app",
+      "startCommand": "python3 -m venv .venv && PIP_USER=0 .venv/bin/python -m pip install -r requirements.txt && FLASK_APP=microblog.py .venv/bin/flask db upgrade && .venv/bin/gunicorn -b 0.0.0.0:8000 --access-logfile - --error-logfile - microblog:app",
       "healthCheck": {
         "type": "http",
-        "path": "/",
+        "path": "/auth/login",
         "timeout": 10
       },
       "preview": true,
